@@ -16,8 +16,6 @@ class dog(zoo):
 
 if a == 0.314:
     printfn(a)
-else:
-    printfn("a != 0.314")
 
 while c < 125:
     printfn(c)

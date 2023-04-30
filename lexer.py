@@ -12,12 +12,11 @@ class lexer:
 
     def run(self):
         lines = self.input.splitlines()
-        row = 0
+        row = 1
         for line in lines:
-            if line == []:
+            if not line.strip() or line.lstrip().startswith("#"):
                 row += 1
                 continue
-
             self.__step(line, row)
             row += 1
 
@@ -34,9 +33,27 @@ class lexer:
                 token.append(output)
                 continue
 
-            # specific check
+            # check literals
+            # deal with eg. "123:"
+            colon_last = False
+            if word[-1] == ":":
+                word = word[0:-1]
+                colon_last = True
+            res = my_DFA.check_Literals(word, p)
+            if res:
+                output = "row: " + str(row) + ", type: " + res + ", content: " + word
+                token.append(output)
+                if colon_last:
+                    output = "row: " + str(row) + ", type: Delimiter, content: :"
+                    token.append(output)
+                continue
+
+            # check identifier and complex word
+            token_complex = my_DFA.check_complex(word, row) 
+            token += token_complex
 
         self.tokens.append(token)
+        print(token)
 
 
 if __name__ == "__main__":
