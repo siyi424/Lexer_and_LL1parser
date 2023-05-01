@@ -1,6 +1,16 @@
-S -> aA
-A -> bB
-B -> c
-
-
-// ab*c
+S -> kF:
+S -> I=L 
+F -> I(P)
+F -> T 
+P -> I 
+P -> ε
+T -> L 
+T -> I 
+T -> B 
+B -> IOI 
+B -> IOL
+I -> .I 
+I -> ,I
+I -> i   
+L -> l  
+O -> o 

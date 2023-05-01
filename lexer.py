@@ -2,13 +2,13 @@
 input: 1. regualr grammer txt file 2. python_code txt file
 output: tokens (row, indentifier, content)
 """
-from preDef import DFA
 
 
 class lexer:
-    def __init__(self, input) -> None:
+    def __init__(self, input, dfa) -> None:
         self.tokens = []
         self.input = input
+        self.dfa = dfa
 
     def run(self):
         lines = self.input.splitlines()
@@ -27,7 +27,7 @@ class lexer:
         p = 0
         for word in words:
             # easy pre-check
-            res = my_DFA.easy_check(word)
+            res = self.dfa.easy_check(word)
             if res:
                 output = "row: " + str(row) + ", type: " + res + ", content: " + word
                 token.append(output)
@@ -39,7 +39,7 @@ class lexer:
             if word[-1] == ":":
                 word = word[0:-1]
                 colon_last = True
-            res = my_DFA.check_Literals(word, p)
+            res = self.dfa.check_Literals(word, p)
             if res:
                 output = "row: " + str(row) + ", type: " + res + ", content: " + word
                 token.append(output)
@@ -49,18 +49,10 @@ class lexer:
                 continue
 
             # check identifier and complex word
-            token_complex = my_DFA.check_complex(word, row) 
+            if colon_last:
+                word += ":"
+            token_complex = self.dfa.check_complex(word, row)
             token += token_complex
 
         self.tokens.append(token)
         print(token)
-
-
-if __name__ == "__main__":
-    txt_cont = ""
-    with open("./test/test_code.txt", "r") as f:
-        txt_cont = f.read()
-
-    my_DFA = DFA()
-    my_lexer = lexer(txt_cont)
-    my_lexer.run()
