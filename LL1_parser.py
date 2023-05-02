@@ -32,11 +32,14 @@ class LL1_parser:
         for v in all_V:
             self.First[v] = self.get_First(v)
         
-        # get Select set
+        # get Follow set
         for vn in self.Vn:
             self.Follow[vn] = self.get_Follow(vn)
+        
+        print("First Set: ")
+        print(self.First)
 
-        # reformat Vn in Select set
+        # reformat Vn in Follow set
         correct = set()
         while len(correct) != len(self.Vn):
             for key, values in self.Follow.items():
@@ -61,9 +64,17 @@ class LL1_parser:
                 if all_cor:
                     correct.add(key)
 
+        print("Follow Set: ")
         print(self.Follow)
-        # judge LL(1)
 
+        # get Sellect set
+        self.get_Sellect()
+
+        print("Select Set:")
+        print(self.Select)
+
+        # judge LL1
+        self.judge_LL1()
 
 
     def _preInfo(self):
@@ -176,7 +187,23 @@ class LL1_parser:
 
         
     def judge_LL1(self):
-        pass
+        '''
+        if the same Vn's Select set has intersection, then this grammer must not be  LL1.
+        '''
+        for key, values in self.Select.items():
+            Intered = False
+            lens = len(values)
+            for i in range(lens):
+                for j in range(i+1, lens):
+                    list1 = values[i]
+                    list2 = values[j]
+                    if set(list1) & set(list2):
+                        Intered = True
+                        print("This grammer is not a LL1 syntax grammer, NO!")
+                        print("Vn: ", key, "has intersected Selected set.")
+                        return
+        print("This grmmer is a LL1 syntax grammer, YES!")
+
 
 
 
@@ -187,7 +214,5 @@ class LL1_parser:
 path = "./test/test_grammer.txt"
 my_parser = LL1_parser(path)
 my_parser.run()
-f = my_parser.get_Follow("S")
-print(f)
 # print("Select:")
 # print(my_parser.Select)
