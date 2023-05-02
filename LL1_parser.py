@@ -22,6 +22,8 @@ class LL1_parser:
                 dict[vl] = [vr]
             else:
                 dict[vl].append(vr)
+        print("Dict:")
+        print(dict)
         return dict
 
     def run(self):
@@ -31,11 +33,11 @@ class LL1_parser:
         all_V = self.Vt + self.Vn
         for v in all_V:
             self.First[v] = self.get_First(v)
-        
+
         # get Follow set
         for vn in self.Vn:
             self.Follow[vn] = self.get_Follow(vn)
-        
+
         print("First Set: ")
         print(self.First)
 
@@ -76,7 +78,6 @@ class LL1_parser:
         # judge LL1
         self.judge_LL1()
 
-
     def _preInfo(self):
         """
         get Vt and Vn set
@@ -114,9 +115,10 @@ class LL1_parser:
             return list(S)
 
     def get_Follow(self, S):
-        '''
+        """
         take care: recursion depth in while loop!
-        '''
+        """
+
         def cal_Fo(S, s_list):
             if S == "S":
                 s_list.append("#")
@@ -133,7 +135,7 @@ class LL1_parser:
                             p_first.remove("ε")
                             if p_first:
                                 s_list += p_first
-                            
+
                         else:
                             # right part is not -> "ε"
                             updated = False
@@ -147,7 +149,6 @@ class LL1_parser:
                         # # change another way:
                         s_list.append(key)
 
-
             return list(set(s_list))
 
         if S in self.Vn:
@@ -155,7 +156,6 @@ class LL1_parser:
             return cal_Fo(S, s_follow)
         else:
             return list(S)
-        
 
     def get_Sellect(self):
         # get right part
@@ -166,53 +166,76 @@ class LL1_parser:
                 # cal item First set
                 first = []
                 for ch in item:
-                    ch_first = self.get_First(ch)
-                    if 'ε' not in ch_first:
+                    ch_first = self.First[ch]
+                    if "ε" not in ch_first:
                         first += ch_first
                         break
                     first += ch_first
                 first = list(set(first))
                 # cal item Select set
-                if 'ε' not in first:
+                if "ε" not in first:
                     self.Select[key].append(first)
                 else:
-                    follow = self.get_Follow(key)
-                    if first == ['ε']:
+                    follow = self.Follow[key]
+                    if first == ["ε"]:
                         added = follow
                     else:
-                        added = first.remove('ε') + follow
+                        added = first.remove("ε") + follow
                     added = list(set(added))
                     self.Select[key].append(added)
         return
 
-        
     def judge_LL1(self):
-        '''
+        """
         if the same Vn's Select set has intersection, then this grammer must not be  LL1.
-        '''
+        """
         for key, values in self.Select.items():
-            Intered = False
             lens = len(values)
             for i in range(lens):
-                for j in range(i+1, lens):
+                for j in range(i + 1, lens):
                     list1 = values[i]
                     list2 = values[j]
                     if set(list1) & set(list2):
-                        Intered = True
                         print("This grammer is not a LL1 syntax grammer, NO!")
                         print("Vn: ", key, "has intersected Selected set.")
                         return
         print("This grmmer is a LL1 syntax grammer, YES!")
 
+    def analyze(self, input):
+        # check if every ch in self.Vt
+        for ch in input:
+            if ch not in self.Vt:
+                print("This sentence doesn't match this grammer, NO!")
+                return
 
+        left = "#S"
+        right = input + "#"
 
+        while left != "#":
+            while left[-1] == right[0]:
+                # match successully
+                left = left[0:-1]
+                right = right[1:]
+            l = left[-1]
+            r = right[0]
+            # find r in select set
+            Found = False
+            Match = ""
+            if l not in self.Vn:
+                print("This sentence doesn't match this grammer, NO!")
+                return
+            for i in range(len(self.Select[l])):
+                s_set = self.Select[l][i]
+                if r in s_set:
+                    Found = True
+                    Match = self.dict[l][i][:]
+                    break
 
+            if not Found:
+                print("This sentence doesn't match this grammer, NO!")
+                return
+            else:
+                left = left[0:-1] + Match[::-1]
 
-
-
-
-path = "./test/test_grammer.txt"
-my_parser = LL1_parser(path)
-my_parser.run()
-# print("Select:")
-# print(my_parser.Select)
+        print("This sentence does match this grammer, YES!")
+        return
