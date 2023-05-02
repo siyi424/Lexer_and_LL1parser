@@ -27,6 +27,12 @@ class LL1_parser:
     def run(self):
         self.Vt, self.Vn = self._preInfo()
 
+        # get First set
+        all_V = self.Vt + self.Vn
+        for v in all_V:
+            self.First[v] = self.get_First(v)
+        
+
     def _preInfo(self):
         """
         get Vt and Vn set
@@ -46,28 +52,63 @@ class LL1_parser:
         print("终结符：", Vt)
         print("非终结符：", Vn)
         return Vt[:], Vn[:]
-    
+
     def get_First(self, S):
-        def cal_F(S, s_list):
+        def cal_Fir(S, s_list):
             for item in self.dict[S]:
                 if item[0] in self.Vt:
                     s_list.append(item[0])
                 else:
-                    cal_F(item[0], s_list)
+                    cal_Fir(item[0], s_list)
             s_list = list(set(s_list))
             return s_list[:]
 
         if S in self.Vn:
             s_first = []
-            return cal_F(S, s_first)
+            return cal_Fir(S, s_first)
         else:
             return list(S)
-            
+
+    def get_Follow(self, S):
+
+        def cal_Fo(S, s_list):
+            if S == 'S':
+                s_list.append("#")
+            for key, items in self.dict.items():
+                for item in items:
+                    if S not in item:
+                        continue
+                    vr = item[::-1]
+                    p = 0
+                    updated = True
+                    while vr[p] != S and updated:
+                        p_first = self.First[vr[p]]
+                        if 'ε' in p_first:
+                            p_first.remove('ε')
+                            s_list += p_first
+                        else:
+                            # right part is not -> "ε"
+                            updated = False
+                            s_list += p_first
+                        p += 1
+                    
+                    if updated:
+                        cal_Fo(key, s_list)
+
+            return list(set(s_list))
+                    
+        
+        if S in self.Vn:
+            s_follow = []
+            return cal_Fo(S, s_follow)
+        else:
+            return list(S)
 
 
 
-path = "./test/test_grammer.txt"
+
+path = "./test/test.txt"
 my_parser = LL1_parser(path)
 my_parser.run()
-l = my_parser.get_First("P")
-print(l)
+f = my_parser.get_Follow("A")
+print(f)
