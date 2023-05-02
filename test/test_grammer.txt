@@ -1,14 +1,9 @@
 S -> kF:
 S -> I=L 
 F -> I(P)
-F -> T 
+F -> OI 
 P -> I 
 P -> ε
-T -> L 
-T -> I 
-T -> B 
-B -> IOI 
-B -> IOL
 I -> .I 
 I -> ,I
 I -> i   
