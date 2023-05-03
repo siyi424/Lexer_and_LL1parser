@@ -1,6 +1,0 @@
-S -> aAB
-S -> d 
-A -> bAS
-A -> ε
-B -> cAB
-B -> ε

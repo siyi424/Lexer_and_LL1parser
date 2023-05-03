@@ -19,6 +19,7 @@ class lexer:
                 continue
             self.__step(line, row)
             row += 1
+        return self.tokens
 
     def __step(self, line, row):
         words = line.split()
