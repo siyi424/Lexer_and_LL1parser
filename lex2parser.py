@@ -35,3 +35,5 @@ def trans2parser(tokens):
         Outputs.append(output)
     print("Output transformed token is: ", Outputs)
     return Outputs
+
+
